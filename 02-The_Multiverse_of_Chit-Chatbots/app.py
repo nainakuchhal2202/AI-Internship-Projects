@@ -3,11 +3,14 @@ from google import genai
 import os
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
+# App header
 st.title("THE MULTIVERSE of CHIT-CHATBOTS")
 st.write("Welcome to the ultimate AI Multiverse✨! Pick your favorite personality, type your message below, and hit 'SEND' to see how they react in their own chaotic style! ✨💬")
 
+# Sidebar settings
 st.sidebar.title("⚙️ Settings")
 personality = st.sidebar.selectbox("Whom do you want to talk to?",
 [   "Shinchan 👦",
@@ -20,6 +23,7 @@ personality = st.sidebar.selectbox("Whom do you want to talk to?",
 ]   
 )
 
+# Assign personality-specific system instruction
 if personality == "Shinchan 👦":
     instruction_text = "You are Shinchan Nohara, the mischievous 5-year-old cartoon character. You are cheeky, highly sarcastic, inappropriately flirtatious, and you never give a straight answer. Love talking about Chocobi, Action Kamen, and beautiful girls. Whenever the user complains about you, criticizes you, or even compliments you, say : 'Arey, mai itna bhi kuch khas nahi!'. Match the user's language style perfectly Never break character."
 elif personality == "Doraemon 🤖":
@@ -35,15 +39,22 @@ elif personality == "Ronaldo Fan (SIUUU) ⚽":
 else:
     instruction_text = "You are the ultimate Gossip Girl, who knows every single scandal in the college. You are witty, classy, slightly judgmental, and live for the tea (gossip). Start or end your thoughts with a conspiratorial tone, asking for drama. You must adapt to the user's language, act like the classic Upper East Side Gossip Girl, act like the ultimate college canteen gossip partner who wants all the chatpati khabar."
 
+
+# Keep responses short like a chat app
 instruction_text += " Keep your responses strictly short and concise (maximum 2-3 sentences). Act like you are chatting on WhatsApp. Never write long paragraphs."
 
+
+# Initialize Gemini client
 if "client" not in st.session_state:
     st.session_state.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-# client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
+
+# Track selected personality
 if "current_personality" not in st.session_state:
     st.session_state.current_personality = personality
 
+
+# Start a new chat when personality changes
 if "chat_session" not in st.session_state or st.session_state.current_personality != personality:
     st.session_state.chat_session = st.session_state.client.chats.create(
         model = "gemini-2.5-flash",
@@ -53,6 +64,8 @@ if "chat_session" not in st.session_state or st.session_state.current_personalit
 
 clear_chat = st.sidebar.button("🗑 Clear Chat")
 
+
+# Clear current conversation
 if clear_chat:
     st.session_state.chat_session = st.session_state.client.chats.create(
         model="gemini-2.5-flash",
@@ -60,6 +73,8 @@ if clear_chat:
     )
     st.success("Chat cleared successfully!")
 
+
+# User input
 user_message = st.chat_input("say something...")
 
 if user_message:
@@ -74,6 +89,9 @@ if user_message:
                 else:
                     with st.chat_message("assistant"):
                         st.write(msg.parts[0].text)
+
+
+# Sidebar footer
 st.sidebar.markdown("---")
 st.sidebar.subheader("About")
 st.sidebar.write(
